@@ -67,3 +67,15 @@ OpenAPI 3.0 document (copy of the Swagger export) lives at [`docs/openapi.json`]
 ## CI
 
 On GitHub, **push** and **pull_request** to `main` / `master` run [`.github/workflows/ci.yml`](.github/workflows/ci.yml): `npm ci`, `npm run lint`, `npm run test:run`, `npm run build` (Node version from [`.nvmrc`](.nvmrc)).
+
+## Deploy to GitHub Pages
+
+Workflow: [`.github/workflows/deploy-github-pages.yml`](.github/workflows/deploy-github-pages.yml). It runs on **push** to `main` / `master` and on **workflow_dispatch** (manual run).
+
+1. In the repository: **Settings → Pages → Build and deployment**, set **Source** to **GitHub Actions** (not “Deploy from a branch”).
+2. After the first successful run, the site is available at **`https://<owner>.github.io/<repository-name>/`** (project site). The build sets `VITE_BASE_PATH=/<repository-name>/` so asset URLs and React Router match that path.
+3. **API URL in production:** add a repository secret **`VITE_API_BASE_URL`** (same value you use locally, e.g. `https://your-host:8080/api`) under **Settings → Secrets and variables → Actions**. The deploy workflow passes it into `npm run build`. Without it, the app still builds but API calls will fail until the secret is set.
+
+**User/org site (`username.github.io` repo):** Pages lives at the domain root, so the app must be built with `VITE_BASE_PATH=/`. Adjust the workflow env for that repo (or use a dedicated variable) instead of `/<repository-name>/`.
+
+The workflow copies `dist/index.html` to `dist/404.html` so **direct loads** of client-side routes (e.g. `/customers/123`) work on GitHub Pages.

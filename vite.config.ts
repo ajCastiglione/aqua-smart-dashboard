@@ -2,7 +2,11 @@ import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
+// GitHub project Pages uses /<repo>/; local dev uses /. Set VITE_BASE_PATH in CI (see deploy workflow).
+const basePath = process.env.VITE_BASE_PATH ?? '/'
+
 export default defineConfig({
+  base: basePath.endsWith('/') ? basePath : `${basePath}/`,
   plugins: [react()],
   test: {
     environment: 'jsdom',
