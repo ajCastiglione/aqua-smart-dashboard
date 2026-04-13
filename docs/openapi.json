@@ -1,0 +1,2365 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "AquaSmart API",
+        "description": "AquaSmart REST API — customers, vendors, telemetry, alerts, profile pump cycles",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "AquaSmart API Server"
+        }
+    ],
+    "paths": {
+        "/api/customer-alerts": {
+            "get": {
+                "tags": [
+                    "CustomerAlert"
+                ],
+                "summary": "List alerts (paginated)",
+                "operationId": "4c024d383171984c35e59cfce525725e",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 25,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "customer_number",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CustomerAlert"
+                                            }
+                                        },
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "CustomerAlert"
+                ],
+                "summary": "Create an alert row",
+                "operationId": "a2b72b8141101a8f92c1470fd3f9b11d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerAlert"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerAlert"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/customer-alerts/{customerNumber}": {
+            "get": {
+                "tags": [
+                    "CustomerAlert"
+                ],
+                "summary": "Get all alerts for a customer",
+                "operationId": "566b2231c82e1b81db7fa8f32d359c0a",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Alerts for the customer",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CustomerAlert"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "CustomerAlert"
+                ],
+                "summary": "Update all alerts for a customer",
+                "operationId": "1dd2372789d188b94604f916202a5265",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerAlert"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "CustomerAlert"
+                ],
+                "summary": "Delete all alerts for a customer",
+                "operationId": "874606d528a2285f7e1a143c10b80e44",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/customer-cross-references": {
+            "get": {
+                "tags": [
+                    "CustomerCrossReference"
+                ],
+                "summary": "List cross-reference rows (paginated, optional filters)",
+                "operationId": "b76dc7618cc1c2ccaa40de75bd6f9fde",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 25,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "serial_number",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "300zx-zya"
+                        }
+                    },
+                    {
+                        "name": "customer_number",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CustomerCrossReference"
+                                            }
+                                        },
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "CustomerCrossReference"
+                ],
+                "summary": "Create a cross-reference row",
+                "operationId": "3bd8946851b4206e939b68adcc1a8c47",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerCrossReference"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerCrossReference"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/customer-cross-references/{serialNumber}/{customerNumber}": {
+            "get": {
+                "tags": [
+                    "CustomerCrossReference"
+                ],
+                "summary": "Get one row by composite key",
+                "operationId": "35d7e2b93f80082053c3403b442be8c9",
+                "parameters": [
+                    {
+                        "name": "serialNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "300zx-zya"
+                        }
+                    },
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerCrossReference"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "CustomerCrossReference"
+                ],
+                "summary": "Update DateTime (and optional future fields) for a row",
+                "operationId": "35fbd450454459674ae50572284b1b1d",
+                "parameters": [
+                    {
+                        "name": "serialNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "300zx-zya"
+                        }
+                    },
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerCrossReference"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerCrossReference"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "CustomerCrossReference"
+                ],
+                "summary": "Delete a cross-reference row",
+                "operationId": "9684f5d1f24a1d3754dce08580658ab4",
+                "parameters": [
+                    {
+                        "name": "serialNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "300zx-zya"
+                        }
+                    },
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/customer-flow-rate-data": {
+            "get": {
+                "tags": [
+                    "CustomerFlowRateData"
+                ],
+                "summary": "List flow rate rows (paginated)",
+                "operationId": "18218592649ab0bc23e20e5ca2b7c0dd",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 25,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "customer_number",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CustomerFlowRateData"
+                                            }
+                                        },
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "CustomerFlowRateData"
+                ],
+                "summary": "Create a flow rate row",
+                "operationId": "26a11f9b9f589467538e21f04279c153",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerFlowRateData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerFlowRateData"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/customer-flow-rate-data/{customerNumber}": {
+            "get": {
+                "tags": [
+                    "CustomerFlowRateData"
+                ],
+                "summary": "Get all flow rate rows for a customer",
+                "operationId": "e129445fd571437711aa2aeafb868201",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Flow rate rows for the customer",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CustomerFlowRateData"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "CustomerFlowRateData"
+                ],
+                "summary": "Update all flow rate rows for a customer",
+                "operationId": "47afb0038e3c8b9082cd576ca2060baa",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerFlowRateData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "CustomerFlowRateData"
+                ],
+                "summary": "Delete all flow rate rows for a customer",
+                "operationId": "f766baadf3d61ae92bc651d95f2bec4e",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/customer-pressure-data": {
+            "get": {
+                "tags": [
+                    "CustomerPressureData"
+                ],
+                "summary": "List pressure rows (paginated)",
+                "operationId": "c532b62a79f90563d28800e725aac17e",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 25,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "customer_number",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CustomerPressureData"
+                                            }
+                                        },
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "CustomerPressureData"
+                ],
+                "summary": "Create a pressure row",
+                "operationId": "3ef58fad691f4eeae4139ad27b539a5c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerPressureData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerPressureData"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/customer-pressure-data/{customerNumber}": {
+            "get": {
+                "tags": [
+                    "CustomerPressureData"
+                ],
+                "summary": "Get all pressure rows for a customer",
+                "operationId": "62234f90e44270736ca5a094d4e354c6",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pressure rows for the customer",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CustomerPressureData"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "CustomerPressureData"
+                ],
+                "summary": "Update all pressure rows for a customer",
+                "operationId": "d1cbafe1a2a7765f972eddf5ebfe6391",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerPressureData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "CustomerPressureData"
+                ],
+                "summary": "Delete all pressure rows for a customer",
+                "operationId": "3a806805b86dff3e692c37bcc7984394",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/customer-profiles": {
+            "get": {
+                "tags": [
+                    "CustomerProfile"
+                ],
+                "summary": "List all customer profiles (paginated)",
+                "operationId": "f0d44fff32668bb4fe46ad6154666b77",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 25,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of customer profiles",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CustomerProfile"
+                                            }
+                                        },
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "CustomerProfile"
+                ],
+                "summary": "Create a new customer profile",
+                "operationId": "d7337bf786a8f9704fffc11e32755f9b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerProfile"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Customer profile created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerProfile"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/customer-profiles/{customerNumber}": {
+            "get": {
+                "tags": [
+                    "CustomerProfile"
+                ],
+                "summary": "Get a single customer profile",
+                "operationId": "cbf0ed7480aee46b545920f339a1bf47",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "description": "Customer number (primary key)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "CUST-001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Customer profile found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerProfile"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Customer not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "CustomerProfile"
+                ],
+                "summary": "Update a customer profile",
+                "operationId": "dadd2ac8eff1ecd11976ccaaf6b0738c",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "CUST-001"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerProfile"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Customer profile updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerProfile"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Customer not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "CustomerProfile"
+                ],
+                "summary": "Delete a customer profile",
+                "operationId": "61a62e8c459c0b473ff227a6ea95cf16",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "CUST-001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Customer profile deleted"
+                    },
+                    "404": {
+                        "description": "Customer not found"
+                    }
+                }
+            }
+        },
+        "/api/customer-profile-pump-cycles": {
+            "get": {
+                "tags": [
+                    "CustomerProfilePumpCycle"
+                ],
+                "summary": "List pump cycles (optionally filtered by CustomerNumber)",
+                "operationId": "31117f11df7e222d04b10b99e6d4865a",
+                "parameters": [
+                    {
+                        "name": "customer_number",
+                        "in": "query",
+                        "description": "Filter by CustomerNumber",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "CUST-001"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 25,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of pump cycles",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CustomerProfilePumpCycle"
+                                            }
+                                        },
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "CustomerProfilePumpCycle"
+                ],
+                "summary": "Create a new pump cycle record",
+                "operationId": "96c8512e9e5bc7bf9c11b04bd7dce098",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerProfilePumpCycle"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Pump cycle created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerProfilePumpCycle"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/customer-profile-pump-cycles/{customerNumber}/{sequenceNumber}": {
+            "get": {
+                "tags": [
+                    "CustomerProfilePumpCycle"
+                ],
+                "summary": "Get a single pump cycle by composite key",
+                "operationId": "61820ec2a8ff69ac8aef5bab9ec4b86a",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "CUST-001"
+                        }
+                    },
+                    {
+                        "name": "sequenceNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pump cycle record",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerProfilePumpCycle"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Record not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "CustomerProfilePumpCycle"
+                ],
+                "summary": "Update a pump cycle record",
+                "operationId": "dd864c1b093dc8a1dbb3977e3138da91",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "CUST-001"
+                        }
+                    },
+                    {
+                        "name": "sequenceNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerProfilePumpCycle"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pump cycle updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerProfilePumpCycle"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Record not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "CustomerProfilePumpCycle"
+                ],
+                "summary": "Delete a pump cycle record",
+                "operationId": "05afc00dc781cd2768f10c2a7e65bfbd",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "CUST-001"
+                        }
+                    },
+                    {
+                        "name": "sequenceNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Record deleted"
+                    },
+                    "404": {
+                        "description": "Record not found"
+                    }
+                }
+            }
+        },
+        "/api/customer-temp-data": {
+            "get": {
+                "tags": [
+                    "CustomerTempData"
+                ],
+                "summary": "List temperature rows (paginated)",
+                "operationId": "249c0284d298d56d3629b4f560f8d3b4",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 25,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "customer_number",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CustomerTempData"
+                                            }
+                                        },
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "CustomerTempData"
+                ],
+                "summary": "Create a temperature row",
+                "operationId": "5c70320eb9af4929fd3203c7e5ffa866",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerTempData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CustomerTempData"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/customer-temp-data/{customerNumber}": {
+            "get": {
+                "tags": [
+                    "CustomerTempData"
+                ],
+                "summary": "Get all temperature rows for a customer",
+                "operationId": "b3a454ab08e31f9015eb9c6955d0671d",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Temperature rows for the customer",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/CustomerTempData"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "CustomerTempData"
+                ],
+                "summary": "Update all temperature rows for a customer",
+                "operationId": "9327099caa81929b7d35ed14142e6fad",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CustomerTempData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "CustomerTempData"
+                ],
+                "summary": "Delete all temperature rows for a customer",
+                "operationId": "654ffdbb2fbb529192315e0c1e2e3bce",
+                "parameters": [
+                    {
+                        "name": "customerNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/serial-numbers": {
+            "get": {
+                "tags": [
+                    "SerialNumber"
+                ],
+                "summary": "List serial numbers (paginated, optional filters)",
+                "operationId": "9657f7a2c520c6afc835a3c1df2cf678",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 25,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "customer_number",
+                        "in": "query",
+                        "description": "Filter by CustomerNumber",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "100001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/SerialNumber"
+                                            }
+                                        },
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "SerialNumber"
+                ],
+                "summary": "Create a serial number record",
+                "operationId": "c9d0fcd4e6c25d4d12e66e98ff2368fe",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SerialNumber"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SerialNumber"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/serial-numbers/{serialNumber}": {
+            "get": {
+                "tags": [
+                    "SerialNumber"
+                ],
+                "summary": "Get a serial number record",
+                "operationId": "63d3afe7ceed5b8a6a5ad57b17653c48",
+                "parameters": [
+                    {
+                        "name": "serialNumber",
+                        "in": "path",
+                        "description": "URL-encode if the value contains reserved characters",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "300zx-zya"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SerialNumber"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "SerialNumber"
+                ],
+                "summary": "Update a serial number record",
+                "operationId": "05045496b5b57304eb1e55f1c4ff53b3",
+                "parameters": [
+                    {
+                        "name": "serialNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "300zx-zya"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SerialNumber"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SerialNumber"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "SerialNumber"
+                ],
+                "summary": "Delete a serial number record",
+                "operationId": "4f281a1363eefcd8d3a41269d87dd212",
+                "parameters": [
+                    {
+                        "name": "serialNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "300zx-zya"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/api/vendor-profiles": {
+            "get": {
+                "tags": [
+                    "VendorProfile"
+                ],
+                "summary": "List vendor profiles (paginated)",
+                "operationId": "17036471dfcf2398caa9d47e0098b868",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 25,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/VendorProfile"
+                                            }
+                                        },
+                                        "current_page": {
+                                            "type": "integer"
+                                        },
+                                        "last_page": {
+                                            "type": "integer"
+                                        },
+                                        "per_page": {
+                                            "type": "integer"
+                                        },
+                                        "total": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "VendorProfile"
+                ],
+                "summary": "Create a vendor profile",
+                "operationId": "9ea915af4c5d1fadf956b57c1510db9c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VendorProfile"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VendorProfile"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/vendor-profiles/{vendorNumber}": {
+            "get": {
+                "tags": [
+                    "VendorProfile"
+                ],
+                "summary": "Get a vendor profile by VendorNumber",
+                "operationId": "75c50e8c018d8b207264797b693fc909",
+                "parameters": [
+                    {
+                        "name": "vendorNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "500001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VendorProfile"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "VendorProfile"
+                ],
+                "summary": "Update a vendor profile",
+                "operationId": "dbb0dd986f3696a5492f85b580a5a07c",
+                "parameters": [
+                    {
+                        "name": "vendorNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "500001"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VendorProfile"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VendorProfile"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "VendorProfile"
+                ],
+                "summary": "Delete a vendor profile",
+                "operationId": "3ba9cad573aa801ae513de12a76b40a9",
+                "parameters": [
+                    {
+                        "name": "vendorNumber",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "500001"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Deleted"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CustomerAlert": {
+                "required": [
+                    "CustomerNumber",
+                    "DateTime"
+                ],
+                "properties": {
+                    "CustomerNumber": {
+                        "type": "string",
+                        "example": "100001",
+                        "maxLength": 20
+                    },
+                    "DateTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-02-24T12:00:00.000000Z"
+                    },
+                    "Sequence#": {
+                        "type": "string",
+                        "example": "1",
+                        "nullable": true,
+                        "maxLength": 20
+                    },
+                    "Status": {
+                        "type": "string",
+                        "example": "Open",
+                        "nullable": true,
+                        "maxLength": 20
+                    },
+                    "Alert": {
+                        "type": "string",
+                        "example": "Low flow",
+                        "nullable": true,
+                        "maxLength": 200
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerCrossReference": {
+                "required": [
+                    "SerialNumber",
+                    "Customer_Number"
+                ],
+                "properties": {
+                    "SerialNumber": {
+                        "type": "string",
+                        "example": "300zx-zya",
+                        "maxLength": 30
+                    },
+                    "Customer_Number": {
+                        "type": "string",
+                        "example": "100001",
+                        "maxLength": 20
+                    },
+                    "DateTime": {
+                        "description": "Set to current time on create/update if omitted in the request body.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-02-24T12:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerFlowRateData": {
+                "required": [
+                    "CustomerNumber",
+                    "DateTime"
+                ],
+                "properties": {
+                    "CustomerNumber": {
+                        "type": "string",
+                        "example": "100001",
+                        "maxLength": 20
+                    },
+                    "DateTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-02-24T12:00:00.000000Z"
+                    },
+                    "SequenceNumber": {
+                        "type": "string",
+                        "example": "1",
+                        "nullable": true,
+                        "maxLength": 20
+                    },
+                    "Pump_Status": {
+                        "type": "string",
+                        "example": "On",
+                        "nullable": true,
+                        "maxLength": 20
+                    },
+                    "Flow_Rate": {
+                        "type": "string",
+                        "example": "42.5",
+                        "nullable": true,
+                        "maxLength": 20
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerPressureData": {
+                "required": [
+                    "CustomerNumber",
+                    "DateTime"
+                ],
+                "properties": {
+                    "CustomerNumber": {
+                        "type": "string",
+                        "example": "100001",
+                        "maxLength": 20
+                    },
+                    "DateTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-02-24T12:00:00.000000Z"
+                    },
+                    "Sequence#": {
+                        "type": "string",
+                        "example": "1",
+                        "nullable": true,
+                        "maxLength": 20
+                    },
+                    "Pressure_Reading": {
+                        "type": "string",
+                        "example": "32",
+                        "nullable": true,
+                        "maxLength": 20
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerProfile": {
+                "required": [
+                    "CustomerNumber",
+                    "FirstName",
+                    "LastName",
+                    "Street",
+                    "City",
+                    "State",
+                    "ZipCode",
+                    "EmailAddress",
+                    "PhoneNumber",
+                    "VendorNumber",
+                    "VendorName",
+                    "TechName",
+                    "SerialNumber",
+                    "IPAddress"
+                ],
+                "properties": {
+                    "CustomerNumber": {
+                        "type": "string",
+                        "example": "CUST-001",
+                        "maxLength": 20
+                    },
+                    "FirstName": {
+                        "type": "string",
+                        "example": "John",
+                        "maxLength": 50
+                    },
+                    "LastName": {
+                        "type": "string",
+                        "example": "Doe",
+                        "maxLength": 50
+                    },
+                    "Email": {
+                        "type": "string",
+                        "example": "john@example.com",
+                        "nullable": true,
+                        "maxLength": 100
+                    },
+                    "Street": {
+                        "type": "string",
+                        "example": "123 Main St",
+                        "maxLength": 50
+                    },
+                    "City": {
+                        "type": "string",
+                        "example": "Springfield",
+                        "maxLength": 50
+                    },
+                    "State": {
+                        "type": "string",
+                        "example": "IL",
+                        "maxLength": 50
+                    },
+                    "ZipCode": {
+                        "type": "string",
+                        "example": "62701",
+                        "maxLength": 50
+                    },
+                    "EmailAddress": {
+                        "type": "string",
+                        "example": "john@example.com",
+                        "maxLength": 50
+                    },
+                    "PhoneNumber": {
+                        "type": "string",
+                        "example": "555-1234",
+                        "maxLength": 50
+                    },
+                    "VendorNumber": {
+                        "type": "string",
+                        "example": "VND-001",
+                        "maxLength": 50
+                    },
+                    "VendorName": {
+                        "type": "string",
+                        "example": "AquaVendor",
+                        "maxLength": 50
+                    },
+                    "TechName": {
+                        "type": "string",
+                        "example": "Tech Smith",
+                        "maxLength": 50
+                    },
+                    "SerialNumber": {
+                        "type": "string",
+                        "example": "SN-987654",
+                        "maxLength": 50
+                    },
+                    "RegistrationDate": {
+                        "description": "Optional on create; defaults to start of current day. ISO 8601 in responses.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T00:00:00.000000Z"
+                    },
+                    "InstallDate": {
+                        "description": "Optional on create; defaults to RegistrationDate.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-20T00:00:00.000000Z"
+                    },
+                    "UpdateDate": {
+                        "description": "Set by the server on create (start of day) and on every update (current time).",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "example": "2024-06-01T12:00:00.000000Z"
+                    },
+                    "IPAddress": {
+                        "type": "string",
+                        "example": "192.168.1.10",
+                        "maxLength": 50
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerProfilePumpCycle": {
+                "required": [
+                    "CustomerNumber",
+                    "SequenceNumber",
+                    "TimeZone",
+                    "DayofWeek",
+                    "StartTime",
+                    "Start-AM-PM",
+                    "EndTime",
+                    "End-AM-PM",
+                    "CleaningCycle"
+                ],
+                "properties": {
+                    "CustomerNumber": {
+                        "type": "string",
+                        "example": "CUST-001",
+                        "maxLength": 20
+                    },
+                    "SequenceNumber": {
+                        "type": "string",
+                        "example": "1",
+                        "maxLength": 20
+                    },
+                    "TimeZone": {
+                        "type": "string",
+                        "example": "CST",
+                        "maxLength": 20
+                    },
+                    "DayofWeek": {
+                        "type": "string",
+                        "example": "Monday",
+                        "maxLength": 20
+                    },
+                    "StartTime": {
+                        "type": "string",
+                        "example": "08:00",
+                        "maxLength": 20
+                    },
+                    "Start-AM-PM": {
+                        "type": "string",
+                        "example": "AM",
+                        "maxLength": 2,
+                        "enum": [
+                            "AM",
+                            "PM"
+                        ]
+                    },
+                    "EndTime": {
+                        "type": "string",
+                        "example": "09:00",
+                        "maxLength": 20
+                    },
+                    "End-AM-PM": {
+                        "type": "string",
+                        "example": "AM",
+                        "maxLength": 2,
+                        "enum": [
+                            "AM",
+                            "PM"
+                        ]
+                    },
+                    "CleaningCycle": {
+                        "type": "string",
+                        "example": "Y",
+                        "maxLength": 1,
+                        "enum": [
+                            "Y",
+                            "N"
+                        ]
+                    },
+                    "updatedate": {
+                        "description": "Set by the server on create and update. ISO 8601 in responses.",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "example": "2024-06-01T08:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            },
+            "CustomerTempData": {
+                "required": [
+                    "Customer_Number",
+                    "Date",
+                    "Time",
+                    "Sequence_Number"
+                ],
+                "properties": {
+                    "Customer_Number": {
+                        "type": "string",
+                        "example": "100001",
+                        "maxLength": 20
+                    },
+                    "Date": {
+                        "type": "string",
+                        "example": "02/24/2026",
+                        "maxLength": 20
+                    },
+                    "Time": {
+                        "type": "string",
+                        "example": "14:30:00",
+                        "maxLength": 20
+                    },
+                    "Sequence_Number": {
+                        "type": "string",
+                        "example": "1",
+                        "maxLength": 20
+                    },
+                    "Temp_Reading": {
+                        "type": "string",
+                        "example": "78.5",
+                        "nullable": true,
+                        "maxLength": 20
+                    }
+                },
+                "type": "object"
+            },
+            "SerialNumber": {
+                "required": [
+                    "SerialNumber",
+                    "CustomerNumber"
+                ],
+                "properties": {
+                    "SerialNumber": {
+                        "type": "string",
+                        "example": "300zx-zya",
+                        "maxLength": 30
+                    },
+                    "DateCreated": {
+                        "description": "Defaults to start of current day on create if omitted.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-02-24T00:00:00.000000Z"
+                    },
+                    "DateRegistered": {
+                        "description": "Defaults to start of current day on create if omitted.",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-02-24T00:00:00.000000Z"
+                    },
+                    "CustomerNumber": {
+                        "type": "string",
+                        "example": "100001",
+                        "maxLength": 20
+                    }
+                },
+                "type": "object"
+            },
+            "VendorProfile": {
+                "required": [
+                    "VendorNumber",
+                    "VendorName",
+                    "Street",
+                    "City",
+                    "State",
+                    "ZipCode",
+                    "EmailAddress",
+                    "PhoneNumber"
+                ],
+                "properties": {
+                    "VendorNumber": {
+                        "type": "string",
+                        "example": "500001",
+                        "maxLength": 20
+                    },
+                    "VendorName": {
+                        "type": "string",
+                        "example": "Pinch A Penny",
+                        "maxLength": 50
+                    },
+                    "Street": {
+                        "type": "string",
+                        "example": "123 Main St",
+                        "maxLength": 50
+                    },
+                    "City": {
+                        "type": "string",
+                        "example": "Orlando",
+                        "maxLength": 50
+                    },
+                    "State": {
+                        "type": "string",
+                        "example": "Florida",
+                        "maxLength": 50
+                    },
+                    "ZipCode": {
+                        "type": "string",
+                        "example": "32801",
+                        "maxLength": 50
+                    },
+                    "EmailAddress": {
+                        "type": "string",
+                        "example": "vendor@example.com",
+                        "maxLength": 50
+                    },
+                    "PhoneNumber": {
+                        "type": "string",
+                        "example": "555-0100",
+                        "maxLength": 50
+                    },
+                    "UpdateDate": {
+                        "description": "Set by the server on create and update.",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "example": "2026-02-24T00:00:00.000000Z"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "CustomerProfile",
+            "description": "Customer Profile operations"
+        },
+        {
+            "name": "VendorProfile",
+            "description": "Vendor Profile operations"
+        },
+        {
+            "name": "SerialNumber",
+            "description": "Serial number registry"
+        },
+        {
+            "name": "CustomerCrossReference",
+            "description": "Serial ↔ customer cross-reference"
+        },
+        {
+            "name": "CustomerProfilePumpCycle",
+            "description": "Scheduled pump windows (Customer_Profile_PumpCycle)"
+        },
+        {
+            "name": "CustomerAlert",
+            "description": "Customer_Alerts"
+        },
+        {
+            "name": "CustomerFlowRateData",
+            "description": "Customer_FlowRate_Data"
+        },
+        {
+            "name": "CustomerPressureData",
+            "description": "Customer_Pressure_Data"
+        },
+        {
+            "name": "CustomerTempData",
+            "description": "Customer_Temp_Data"
+        }
+    ]
+}
