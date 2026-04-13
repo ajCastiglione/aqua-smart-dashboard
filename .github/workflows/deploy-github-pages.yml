@@ -31,13 +31,33 @@ jobs:
       - name: Install
         run: npm ci
 
+      # User/org Pages site (e.g. repo `user.github.io`) is served at domain root → base `/`.
+      # Project sites use `https://<owner>.github.io/<repo>/` → base `/<repo>/`.
+      - name: Set Vite base path for GitHub Pages
+        id: vite_base
+        run: |
+          REPO="${{ github.event.repository.name }}"
+          case "$REPO" in
+            *.github.io)
+              echo "path=/" >> "$GITHUB_OUTPUT"
+              echo "Using root base path for user/org GitHub Pages site."
+              ;;
+            *)
+              echo "path=/${REPO}/" >> "$GITHUB_OUTPUT"
+              echo "Using project base path /${REPO}/"
+              ;;
+          esac
+
       - name: Build
         env:
-          # Must match GitHub Pages path for a project site (repo name).
-          VITE_BASE_PATH: /${{ github.event.repository.name }}/
-          # Optional: set in repo Settings → Secrets and variables → Actions
+          VITE_BASE_PATH: ${{ steps.vite_base.outputs.path }}
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-        run: npm run build
+        run: |
+          if [ -z "${VITE_API_BASE_URL}" ]; then
+            echo "::error::Set repository secret VITE_API_BASE_URL (e.g. https://your-api-host:8080/api). Without it, axios calls /customer-profiles on github.io and you get 404s."
+            exit 1
+          fi
+          npm run build
 
       - name: SPA fallback for GitHub Pages
         run: cp dist/index.html dist/404.html

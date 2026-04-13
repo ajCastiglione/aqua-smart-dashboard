@@ -79,3 +79,14 @@ Workflow: [`.github/workflows/deploy-github-pages.yml`](.github/workflows/deploy
 **User/org site (`username.github.io` repo):** Pages lives at the domain root, so the app must be built with `VITE_BASE_PATH=/`. Adjust the workflow env for that repo (or use a dedicated variable) instead of `/<repository-name>/`.
 
 The workflow copies `dist/index.html` to `dist/404.html` so **direct loads** of client-side routes (e.g. `/customers/123`) work on GitHub Pages.
+
+### Troubleshooting: 404 on `https://<you>.github.io/customer-profiles`
+
+That URL means the browser is requesting the **API path on GitHub Pages**, not your REST server. The deploy build **must** include **`VITE_API_BASE_URL`** via the repository secret so Axios uses an absolute base (e.g. `https://api.example.com/api`). If the secret is missing, `baseURL` is empty and `GET /customer-profiles` becomes a request to your Pages origin → 404.
+
+Also ensure:
+
+- **CORS:** your API allows the `Origin` of your GitHub Pages site (e.g. `https://ajcastiglione.github.io`).
+- **HTTPS:** Pages is served over **HTTPS**. If the API is **HTTP-only**, the browser may **block** requests (mixed content), not show a GitHub 404 — use HTTPS for the API or a proxy.
+
+The workflow **fails the build** if `VITE_API_BASE_URL` is not set, so broken deploys should not publish without it. Repos named `*.github.io` use **`VITE_BASE_PATH=/`** automatically; other repos use **`/<repo-name>/`**.
