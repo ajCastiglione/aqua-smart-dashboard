@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { getSerialNumber, getSerialNumbers } from '../../api/endpoints/serial-numbers'
 import type { SerialNumbersListParams } from '../../api/endpoints/serial-numbers'
 import { queryKeys } from './query-keys'
@@ -17,4 +18,6 @@ export const useSerialNumber = (serialNumber: string | undefined) =>
     queryKey: queryKeys.serialNumber(serialNumber ?? ''),
     queryFn: () => getSerialNumber(serialNumber!),
     enabled: Boolean(serialNumber),
+    retry: (_failureCount, err) =>
+      !(isAxiosError(err) && err.response?.status === 404),
   })

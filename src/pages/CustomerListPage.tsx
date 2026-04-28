@@ -14,7 +14,7 @@ import { useCustomerProfiles } from '../hooks/queries/customer-profile-queries'
 import { queryKeys } from '../hooks/queries/query-keys'
 import { fetchCustomerRowMetrics } from '../utils/customer-row-metrics'
 import { deriveCustomerRowStatus } from '../utils/customer-status'
-import { getErrorMessage } from '../utils/errors'
+import { parseApiError } from '../utils/errors'
 import { formatFullName, formatStreetAddress } from '../utils/format'
 
 const PER_PAGE = 15
@@ -161,9 +161,14 @@ export const CustomerListPage = () => {
   }
 
   if (profilesQuery.isError) {
+    const listErr = parseApiError(profilesQuery.error)
     return (
       <Card>
-        <ErrorMessage message={getErrorMessage(profilesQuery.error)} onRetry={handleRetry} />
+        <ErrorMessage
+          title={listErr.title}
+          message={listErr.message}
+          onRetry={handleRetry}
+        />
       </Card>
     )
   }
