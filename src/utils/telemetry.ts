@@ -12,30 +12,79 @@ export const parseNumericString = (
   return Number.isFinite(parsed) ? parsed : undefined;
 };
 
-const maxByDateTime = <T extends { DateTime: string }>(
+const dateTimeToMs = (raw: string | null | undefined): number => {
+  if (raw == null || String(raw).trim() === "") return Number.NaN;
+  const ms = new Date(raw).getTime();
+  return Number.isFinite(ms) ? ms : Number.NaN;
+};
+
+/**
+ * Latest row that has a numeric metric reading. Uses `DateTime` when parseable; otherwise the
+ * last matching row (same pattern as {@link latestTempReading} for Date/Time + Temp_Reading).
+ */
+const latestReadingWithMetric = <T extends { DateTime?: string | null }>(
   rows: T[],
+  metricRaw: (row: T) => string | null | undefined,
 ): T | undefined => {
   if (rows.length === 0) return undefined;
-  let bestRow = rows[0]!;
-  let bestTimeMs = new Date(bestRow.DateTime).getTime();
-  for (let index = 1; index < rows.length; index++) {
-    const candidateRow = rows[index]!;
-    const candidateTimeMs = new Date(candidateRow.DateTime).getTime();
+
+  const withMetric = rows.filter(
+    row => parseNumericString(metricRaw(row)) !== undefined,
+  );
+  if (withMetric.length === 0) return undefined;
+
+  let bestRow: T | undefined;
+  let bestTimeMs = Number.NEGATIVE_INFINITY;
+  for (const row of withMetric) {
+    const candidateTimeMs = dateTimeToMs(row.DateTime);
+    if (!Number.isFinite(candidateTimeMs)) continue;
     if (candidateTimeMs > bestTimeMs) {
-      bestRow = candidateRow;
+      bestRow = row;
       bestTimeMs = candidateTimeMs;
     }
   }
-  return bestRow;
+  if (bestRow !== undefined) return bestRow;
+
+  return withMetric[withMetric.length - 1];
 };
 
 export const latestPressureReading = (
   rows: CustomerPressureData[],
-): CustomerPressureData | undefined => maxByDateTime(rows);
+): CustomerPressureData | undefined =>
+  latestReadingWithMetric(
+    rows,
+    row => row.Pressure_Reading ?? row.pressure_reading,
+  );
 
+/** Raw flow value from a row (Pascal or snake_case from API). */
+export const flowRateRaw = (
+  row: CustomerFlowRateData | undefined,
+): string | null | undefined =>
+  row == null ? undefined : (row.Flow_Rate ?? row.flow_rate);
+
+/** Raw pressure value from a row (Pascal or snake_case from API). */
+export const pressureReadingRaw = (
+  row: CustomerPressureData | undefined,
+): string | null | undefined =>
+  row == null ? undefined : (row.Pressure_Reading ?? row.pressure_reading);
+
+/**
+ * Latest flow row for dashboards. The API often appends idle readings (`Flow_Rate` "0.00") with
+ * the newest `DateTime`; non-zero history still exists on older rows. Prefer the latest row with a
+ * **non-zero** numeric rate when any exist, otherwise the latest row including zeros.
+ */
 export const latestFlowReading = (
   rows: CustomerFlowRateData[],
-): CustomerFlowRateData | undefined => maxByDateTime(rows);
+): CustomerFlowRateData | undefined => {
+  const nonZero = rows.filter(row => {
+    const n = parseNumericString(flowRateRaw(row));
+    return n !== undefined && n !== 0;
+  });
+  if (nonZero.length > 0) {
+    return latestReadingWithMetric(nonZero, row => flowRateRaw(row));
+  }
+  return latestReadingWithMetric(rows, row => flowRateRaw(row));
+};
 
 /** Parse MM/DD/YYYY + HH:mm:ss for sorting and charts. Returns NaN if Date/Time are missing or invalid. */
 export const tempRowToTimestamp = (row: CustomerTempData): number => {

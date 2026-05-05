@@ -4,39 +4,43 @@
  * backend batch or dashboard endpoint would scale better; client-side caching (TanStack Query,
  * 5m stale) only helps repeat views.
  */
-import { getCustomerAlertsForCustomer } from '../api/endpoints/customer-alerts'
-import { getCustomerFlowRateDataForCustomer } from '../api/endpoints/customer-flowrate-data'
-import { getCustomerPressureDataForCustomer } from '../api/endpoints/customer-pressure-data'
-import { getCustomerTempDataForCustomer } from '../api/endpoints/customer-temp-data'
-import { isOpenAlert } from './alerts'
+import { getCustomerAlertsForCustomer } from "../api/endpoints/customer-alerts";
+import { getCustomerFlowRateDataForCustomer } from "../api/endpoints/customer-flowrate-data";
+import { getCustomerPressureDataForCustomer } from "../api/endpoints/customer-pressure-data";
+import { getCustomerTempDataForCustomer } from "../api/endpoints/customer-temp-data";
+import { isOpenAlert } from "./alerts";
 import {
+  flowRateRaw,
   latestFlowReading,
   latestPressureReading,
   latestTempReading,
   parseNumericString,
-} from './telemetry'
-import type { CustomerRowMetrics } from './customer-status'
+  pressureReadingRaw,
+} from "./telemetry";
+import type { CustomerRowMetrics } from "./customer-status";
 
 export const fetchCustomerRowMetrics = async (
   customerNumber: string,
 ): Promise<CustomerRowMetrics> => {
-  const [alertRows, pressureReadings, flowRateReadings, temperatureReadings] = await Promise.all([
-    getCustomerAlertsForCustomer(customerNumber),
-    getCustomerPressureDataForCustomer(customerNumber),
-    getCustomerFlowRateDataForCustomer(customerNumber),
-    getCustomerTempDataForCustomer(customerNumber),
-  ])
+  const [alertRows, pressureReadings, flowRateReadings, temperatureReadings] =
+    await Promise.all([
+      getCustomerAlertsForCustomer(customerNumber),
+      getCustomerPressureDataForCustomer(customerNumber),
+      getCustomerFlowRateDataForCustomer(customerNumber),
+      getCustomerTempDataForCustomer(customerNumber),
+    ]);
 
-  const openAlertCount = alertRows.filter(isOpenAlert).length
-  const latestPressureRow = latestPressureReading(pressureReadings)
-  const latestFlowRateRow = latestFlowReading(flowRateReadings)
-  const latestTemperatureRow = latestTempReading(temperatureReadings)
+  const openAlertCount = alertRows.filter(isOpenAlert).length;
+  const latestPressureRow = latestPressureReading(pressureReadings);
+  const latestFlowRateRow = latestFlowReading(flowRateReadings);
+  const latestTemperatureRow = latestTempReading(temperatureReadings);
 
   return {
     openAlertCount,
-    pressurePsi: parseNumericString(latestPressureRow?.Pressure_Reading),
-    flowGpm: parseNumericString(latestFlowRateRow?.Flow_Rate),
+    pressurePsi: parseNumericString(pressureReadingRaw(latestPressureRow)),
+    flowGpm: parseNumericString(flowRateRaw(latestFlowRateRow)),
     poolTempFahrenheit: parseNumericString(latestTemperatureRow?.Temp_Reading),
-    pumpStatus: latestFlowRateRow?.Pump_Status ?? null,
-  }
-}
+    pumpStatus:
+      latestFlowRateRow?.Pump_Status ?? latestFlowRateRow?.pump_status ?? null,
+  };
+};

@@ -21,10 +21,12 @@ import {
   formatStreetAddress,
 } from "../utils/format";
 import {
+  flowRateRaw,
   latestFlowReading,
   latestPressureReading,
   latestTempReading,
   parseNumericString,
+  pressureReadingRaw,
 } from "../utils/telemetry";
 
 type TabId = "info" | "servicing" | "notes" | "messages";
@@ -77,8 +79,8 @@ export const CustomerDetailPage = () => {
   const poolTempFahrenheit = parseNumericString(
     latestTemperatureRow?.Temp_Reading,
   );
-  const pressurePsi = parseNumericString(latestPressureRow?.Pressure_Reading);
-  const flowGpm = parseNumericString(latestFlowRateRow?.Flow_Rate);
+  const pressurePsi = parseNumericString(pressureReadingRaw(latestPressureRow));
+  const flowGpm = parseNumericString(flowRateRaw(latestFlowRateRow));
 
   const pumpCycles = pumpQuery.data?.data ?? [];
 
