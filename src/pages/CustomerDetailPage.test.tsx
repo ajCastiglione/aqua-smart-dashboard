@@ -86,9 +86,9 @@ describe("CustomerDetailPage", () => {
       data: [
         {
           CustomerNumber: "C-200",
-          DateTime: "2024-01-01 12:00:00",
+          DateTime: "2024-01-01T12:00:00.000000Z",
           Flow_Rate: "45",
-          Pump_Status: "on",
+          Pump_Status: "On",
         },
       ],
     } as never);
@@ -147,5 +147,36 @@ describe("CustomerDetailPage", () => {
     renderAt("/customers/C-200");
     expect(screen.getByText("Pool Owner")).toBeInTheDocument();
     expect(screen.getByText("Chris Tech")).toBeInTheDocument();
+  });
+
+  it("shows pump status on the info tab from flow telemetry", () => {
+    renderAt("/customers/C-200");
+    expect(screen.getByText("Pump status")).toBeInTheDocument();
+    expect(screen.getByText("On")).toBeInTheDocument();
+  });
+
+  it("explains when GPM reflects last non-zero flow but latest reading is zero", () => {
+    vi.mocked(useCustomerFlowRateByCustomer).mockReturnValue({
+      ...baseQuery,
+      data: [
+        {
+          CustomerNumber: "C-200",
+          DateTime: "2024-01-02T12:00:00.000000Z",
+          Flow_Rate: "0.00",
+          Pump_Status: "Off",
+        },
+        {
+          CustomerNumber: "C-200",
+          DateTime: "2024-01-01T12:00:00.000000Z",
+          Flow_Rate: "45",
+          Pump_Status: "On",
+        },
+      ],
+    } as never);
+    renderAt("/customers/C-200");
+    expect(screen.getByText("Off")).toBeInTheDocument();
+    expect(
+      screen.getByText(/most recent non-zero flow/i),
+    ).toBeInTheDocument();
   });
 });

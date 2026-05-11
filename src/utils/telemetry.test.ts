@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   flowRateRaw,
   latestFlowReading,
+  latestFlowSnapshotByDateTime,
   latestPressureReading,
   latestTempReading,
 } from "./telemetry";
@@ -108,6 +109,26 @@ describe("latestFlowReading", () => {
     const latest = latestFlowReading(rows);
     expect(latest).toBeDefined();
     expect(flowRateRaw(latest)).toBe("88");
+  });
+});
+
+describe("latestFlowSnapshotByDateTime", () => {
+  it("returns the row with the greatest DateTime", () => {
+    const rows = [
+      {
+        CustomerNumber: "C1",
+        DateTime: "2026-04-30T12:00:00.000000Z",
+        Flow_Rate: "40",
+      },
+      {
+        CustomerNumber: "C1",
+        DateTime: "2026-05-01T16:10:16.893000Z",
+        Flow_Rate: "0.00",
+      },
+    ];
+    const snap = latestFlowSnapshotByDateTime(rows);
+    expect(snap?.Flow_Rate).toBe("0.00");
+    expect(latestFlowReading(rows)?.Flow_Rate).toBe("40");
   });
 });
 

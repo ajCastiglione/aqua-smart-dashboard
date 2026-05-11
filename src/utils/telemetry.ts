@@ -62,6 +62,12 @@ export const flowRateRaw = (
 ): string | null | undefined =>
   row == null ? undefined : (row.Flow_Rate ?? row.flow_rate);
 
+/** Raw pump status from a row (Pascal or snake_case from API). */
+export const pumpStatusRaw = (
+  row: CustomerFlowRateData | undefined,
+): string | null | undefined =>
+  row == null ? undefined : (row.Pump_Status ?? row.pump_status);
+
 /** Raw pressure value from a row (Pascal or snake_case from API). */
 export const pressureReadingRaw = (
   row: CustomerPressureData | undefined,
@@ -84,6 +90,29 @@ export const latestFlowReading = (
     return latestReadingWithMetric(nonZero, row => flowRateRaw(row));
   }
   return latestReadingWithMetric(rows, row => flowRateRaw(row));
+};
+
+/**
+ * Newest flow row by equipment `DateTime` (current snapshot). Used for pump on/off so it matches
+ * the latest reading, including 0 GPM when idle; unlike {@link latestFlowReading}, which may pick
+ * an older non-zero flow for the GPM tile.
+ */
+export const latestFlowSnapshotByDateTime = (
+  rows: CustomerFlowRateData[],
+): CustomerFlowRateData | undefined => {
+  if (rows.length === 0) return undefined;
+  let bestRow: CustomerFlowRateData | undefined;
+  let bestTimeMs = Number.NEGATIVE_INFINITY;
+  for (const row of rows) {
+    const candidateTimeMs = dateTimeToMs(row.DateTime);
+    if (!Number.isFinite(candidateTimeMs)) continue;
+    if (candidateTimeMs > bestTimeMs) {
+      bestRow = row;
+      bestTimeMs = candidateTimeMs;
+    }
+  }
+  if (bestRow !== undefined) return bestRow;
+  return rows[rows.length - 1];
 };
 
 /** Parse MM/DD/YYYY + HH:mm:ss for sorting and charts. Returns NaN if Date/Time are missing or invalid. */

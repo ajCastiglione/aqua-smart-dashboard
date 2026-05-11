@@ -15,4 +15,31 @@ describe('MetricTiles', () => {
     expect(screen.getByText('12')).toBeInTheDocument()
     expect(screen.getByText('45')).toBeInTheDocument()
   })
+
+  it('shows pump status when provided', () => {
+    render(
+      <MetricTiles
+        poolTempFahrenheit={80}
+        pressurePsi={10}
+        flowGpm={20}
+        pumpStatus={{ primaryLabel: 'On' }}
+      />,
+    )
+    expect(screen.getByText('Pump status')).toBeInTheDocument()
+    expect(screen.getByText('On')).toBeInTheDocument()
+  })
+
+  it('shows pump status hint when provided', () => {
+    render(
+      <MetricTiles
+        pumpStatus={{
+          primaryLabel: 'Off',
+          hint: 'Inferred from the latest flow reading (0 GPM).',
+        }}
+      />,
+    )
+    expect(
+      screen.getByText(/Inferred from the latest flow reading/),
+    ).toBeInTheDocument()
+  })
 })

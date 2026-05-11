@@ -20,13 +20,16 @@ import {
   formatInstallDate,
   formatStreetAddress,
 } from "../utils/format";
+import { buildPumpStatusTileDisplay } from "../utils/pump-status";
 import {
   flowRateRaw,
   latestFlowReading,
+  latestFlowSnapshotByDateTime,
   latestPressureReading,
   latestTempReading,
   parseNumericString,
   pressureReadingRaw,
+  pumpStatusRaw,
 } from "../utils/telemetry";
 
 type TabId = "info" | "servicing" | "notes" | "messages";
@@ -73,14 +76,28 @@ export const CustomerDetailPage = () => {
     );
   }
 
+  const flowRows = flowQuery.data ?? [];
   const latestTemperatureRow = latestTempReading(tempQuery.data ?? []);
   const latestPressureRow = latestPressureReading(pressureQuery.data ?? []);
-  const latestFlowRateRow = latestFlowReading(flowQuery.data ?? []);
+  const flowSnapshotRow = latestFlowSnapshotByDateTime(flowRows);
+  const latestFlowRateRow = latestFlowReading(flowRows);
   const poolTempFahrenheit = parseNumericString(
     latestTemperatureRow?.Temp_Reading,
   );
   const pressurePsi = parseNumericString(pressureReadingRaw(latestPressureRow));
   const flowGpm = parseNumericString(flowRateRaw(latestFlowRateRow));
+  const snapshotFlowGpm = parseNumericString(flowRateRaw(flowSnapshotRow));
+  const pumpStatusTile = buildPumpStatusTileDisplay(
+    pumpStatusRaw(flowSnapshotRow),
+    snapshotFlowGpm,
+  );
+
+  const showFlowGpmFootnote =
+    flowSnapshotRow != null &&
+    latestFlowRateRow != null &&
+    snapshotFlowGpm === 0 &&
+    flowGpm !== undefined &&
+    flowGpm !== 0;
 
   const pumpCycles = pumpQuery.data?.data ?? [];
 
@@ -220,7 +237,16 @@ export const CustomerDetailPage = () => {
                 poolTempFahrenheit={poolTempFahrenheit}
                 pressurePsi={pressurePsi}
                 flowGpm={flowGpm}
+                pumpStatus={pumpStatusTile}
               />
+
+              {showFlowGpmFootnote ? (
+                <p className="text-sm leading-relaxed text-sky-200/85">
+                  GPM shows the most recent non-zero flow from when the pump was
+                  running. The equipment&apos;s newest reading is 0 GPM while
+                  the pump is off or idle.
+                </p>
+              ) : null}
 
               <div className="rounded-xl border border-dashed border-white/20 bg-slate-900/40 p-4">
                 <p className="text-sm font-medium text-sky-200">
